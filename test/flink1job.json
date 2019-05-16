@@ -1,0 +1,12 @@
+{
+    "apiVersion": "operators.srfrnk.com/v1alpha1",
+    "kind": "FlinkJob",
+    "metadata": {
+        "name": "flink1job"
+    },
+    "spec": {
+        "jar": "myjar",
+        "mainclass": "mymainclass",
+        "replicas": 1
+    }
+}
