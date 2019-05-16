@@ -2,5 +2,6 @@
 
 ## Prerequisites
 
-- For GKE only - run: `kubectl create clusterrolebinding <user>-cluster-admin-binding --clusterrole=cluster-admin --user=<user>@<domain>`
-- Install [metacontroller](https://metacontroller.app/guide/install/)
+* For GKE only - run: `kubectl create clusterrolebinding <user>-cluster-admin-binding --clusterrole=cluster-admin --user=<user>@<domain>`
+*
+* Install [metacontroller](https://metacontroller.app/guide/install/) or run `make install-metacontroller`
