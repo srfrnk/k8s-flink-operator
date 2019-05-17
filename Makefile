@@ -5,3 +5,6 @@ install-metacontroller: FORCE
 	kubectl apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/metacontroller/master/manifests/metacontroller-rbac.yaml
 	kubectl apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/metacontroller/master/manifests/metacontroller.yaml
 
+deploy-minikube: FORCE
+	ks env set minikube --server=https://$$(minikube ip):8443
+	ks apply minikube
