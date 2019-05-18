@@ -1,0 +1,151 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    ksonnet.io/component: namespace
+  name: flink
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  labels:
+    ksonnet.io/component: crd
+  name: flinkjobs.operators.srfrnk.com
+  namespace: flink
+spec:
+  additionalPrinterColumns:
+  - JSONPath: .spec.replicas
+    description: Number of job replicas
+    name: Replicas
+    type: integer
+  - JSONPath: .metadata.creationTimestamp
+    description: Time since object was created
+    name: Age
+    type: date
+  categories:
+  - all
+  group: operators.srfrnk.com
+  names:
+    kind: FlinkJob
+    plural: flinkjobs
+    shortNames:
+    - flink
+    - flinks
+    singular: flinkjob
+  scope: Namespaced
+  subresources:
+    scale:
+      labelSelectorPath: .status.labelSelector
+      specReplicasPath: .spec.replicas
+      statusReplicasPath: .status.replicas
+    status: {}
+  validation:
+    openAPIV3Schema:
+      properties:
+        spec:
+          properties:
+            jarImage:
+              type: string
+            jarPath:
+              type: string
+            jobManagerUrl:
+              type: string
+            mainClass:
+              type: string
+            replicas:
+              minimum: 0
+              type: integer
+          required:
+          - replicas
+          - jobManagerUrl
+          - jarImage
+          - jarPath
+          - mainClass
+      required:
+      - spec
+  version: v1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    ksonnet.io/component: service
+  name: flink-controller
+  namespace: flink
+spec:
+  ports:
+  - port: 80
+  selector:
+    app: flink-controller
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    ksonnet.io/component: statefulset
+    version: 190518-1410
+  name: flink-controller
+  namespace: flink
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flink-controller
+  serviceName: flink-controller
+  template:
+    metadata:
+      labels:
+        app: flink-controller
+        version: 190518-1410
+    spec:
+      containers:
+      - args:
+        - npm start
+        command:
+        - bash
+        - -c
+        env:
+        - name: IMAGE_VERSION
+          value: 190518-1410
+        image: srfrnk/flink-controller-app:190518-1410
+        name: controller
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: 100m
+            memory: 100Mi
+          requests:
+            cpu: 10m
+            memory: 10Mi
+---
+apiVersion: metacontroller.k8s.io/v1alpha1
+kind: CompositeController
+metadata:
+  labels:
+    ksonnet.io/component: controller
+  name: flink-controller
+  namespace: flink
+spec:
+  childResources:
+  - apiVersion: v1
+    resource: pods
+    updateStrategy:
+      method: RollingRecreate
+      statusChecks:
+        conditions:
+        - status: "True"
+          type: Ready
+  - apiVersion: v1
+    resource: configmaps
+    updateStrategy:
+      method: Recreate
+  generateSelector: true
+  hooks:
+    sync:
+      webhook:
+        url: http://flink-controller.flink/sync
+  parentResource:
+    apiVersion: operators.srfrnk.com/v1
+    resource: flinkjobs
