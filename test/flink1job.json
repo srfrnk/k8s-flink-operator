@@ -1,12 +1,14 @@
 {
-    "apiVersion": "operators.srfrnk.com/v1alpha1",
+    "apiVersion": "operators.srfrnk.com/v1",
     "kind": "FlinkJob",
     "metadata": {
         "name": "flink1job"
     },
     "spec": {
-        "jar": "myjar",
-        "mainclass": "mymainclass",
-        "replicas": 1
+        "replicas": 1,
+        "jobManagerUrl": "flink-jobmanager:8081",
+        "jarImage": "flink-test:v1",
+        "jarPath": "/jars/flink-test.jar",
+        "mainClass": "flink.test.App"
     }
 }
