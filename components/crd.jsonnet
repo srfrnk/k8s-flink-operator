@@ -49,6 +49,23 @@
               mainClass: {
                 type: 'string',
               },
+              props: {
+                type: 'array',
+                items: {
+                  required: [
+                    'key',
+                    'value',
+                  ],
+                  properties: {
+                    key: {
+                      type: 'string',
+                    },
+                    value: {
+                      type: 'string',
+                    },
+                  },
+                },
+              },
             },
           },
         },

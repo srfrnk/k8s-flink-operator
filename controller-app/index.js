@@ -43,6 +43,7 @@ function getPod(jobName, spec) {
     const pod = JSON.parse(podJson);
     pod.metadata.labels.version = IMAGE_VERSION;
     pod.metadata.name = jobName;
+    const jobProps = spec.props.map(prop => `--${prop.key} ${prop.value}`).join(' ');
     pod.spec.containers[0].env = [
         {
             "name": "jobName",
@@ -60,6 +61,10 @@ function getPod(jobName, spec) {
             "name": "mainClass",
             "value": spec.mainClass
         },
+        {
+            "name": "jobProps",
+            "value": jobProps
+        }
     ];
     pod.spec.containers[1].env = [
         {

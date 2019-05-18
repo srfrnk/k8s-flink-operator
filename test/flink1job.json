@@ -9,6 +9,16 @@
         "jobManagerUrl": "flink-jobmanager:8081",
         "jarImage": "flink-test:v1",
         "jarPath": "/jars/flink-test.jar",
-        "mainClass": "flink.test.App"
+        "mainClass": "flink.test.App",
+        "props": [
+            {
+                "key": "envKey1",
+                "value": "value1"
+            },
+            {
+                "key": "envKey2",
+                "value": "value2"
+            }
+        ]
     }
 }

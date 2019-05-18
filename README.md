@@ -55,6 +55,10 @@ The spec must include:
 - `jarPath`:Absolute path to `JAR` inside image
 - `mainClass`:Full class-name for the job (e.g. "org.example.MyClass")
 
+The following are optional:
+
+- `props`: An array of `{key,value}` props to pass to job. (i.e. via `ParameterTool parameters = ParameterTool.fromArgs(args);`)
+
 The `mainClass` must contain `public static void main(String[] args)` function that runs a `Flink` job.
 
 ## Deployment

@@ -7,8 +7,8 @@ do
      sleep 1
 done
 
-echo "Starting job... flink run -d -c ${mainClass} -m ${jobManagerUrl} ${jarPath} --jobName ${jobName}"
-jobId=$(flink run -d -c ${mainClass} -m ${jobManagerUrl} ${jarPath} --jobName ${jobName} | grep -oP 'JobID \K.*')
+echo "Starting job... flink run -d -c ${mainClass} -m ${jobManagerUrl} ${jarPath} --jobName ${jobName} ${jobProps}"
+jobId=$(flink run -d -c ${mainClass} -m ${jobManagerUrl} ${jarPath} --jobName ${jobName} ${jobProps} | grep -oP 'JobID \K.*')
 echo "Started Job with ID: ${jobId}"
 echo ${jobId} > /app/jobId
 
