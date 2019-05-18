@@ -23,8 +23,6 @@ spec:
     description: Time since object was created
     name: Age
     type: date
-  categories:
-  - all
   group: operators.srfrnk.com
   names:
     kind: FlinkJob
@@ -84,7 +82,7 @@ kind: StatefulSet
 metadata:
   labels:
     ksonnet.io/component: statefulset
-    version: 190518-1410
+    version: 190518-1631
   name: flink-controller
   namespace: flink
 spec:
@@ -97,7 +95,7 @@ spec:
     metadata:
       labels:
         app: flink-controller
-        version: 190518-1410
+        version: 190518-1631
     spec:
       containers:
       - args:
@@ -107,8 +105,8 @@ spec:
         - -c
         env:
         - name: IMAGE_VERSION
-          value: 190518-1410
-        image: srfrnk/flink-controller-app:190518-1410
+          value: 190518-1631
+        image: srfrnk/flink-controller-app:190518-1631
         name: controller
         ports:
         - containerPort: 80

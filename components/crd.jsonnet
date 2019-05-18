@@ -76,8 +76,5 @@
         labelSelectorPath: '.status.labelSelector',
       },
     },
-    categories: [
-      'all',
-    ],
   },
 }
