@@ -8,7 +8,13 @@ do
 done
 
 echo "Starting job... flink run -d -c ${mainClass} -m ${jobManagerUrl} ${jarPath} --jobName ${jobName} ${jobProps}"
-jobId=$(flink run -d -c ${mainClass} -m ${jobManagerUrl} ${jarPath} --jobName ${jobName} ${jobProps} | grep -oP 'JobID \K.*')
+jobRun=$(flink run -d -c ${mainClass} -m ${jobManagerUrl} ${jarPath} --jobName ${jobName} ${jobProps})
+
+echo ""
+echo ${jobRun}
+echo ""
+
+jobId=$(echo ${jobRun} | grep -oP 'JobID \K[a-z0-9]*' | head -n1)
 echo "Started Job with ID: ${jobId}"
 echo ${jobId} > /app/jobId
 
@@ -16,6 +22,4 @@ sleep infinity & wait
 
 echo "Stopping job ${jobId}..."
 flink stop -m ${jobManagerUrl} ${jobId}
-# echo "Cancelling job ${jobId}... (if not stopped)"
-# flink cancel -m ${jobManagerUrl} ${jobId}
 echo "Exiting"
