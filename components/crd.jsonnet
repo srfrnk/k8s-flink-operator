@@ -54,7 +54,6 @@
                 items: {
                   required: [
                     'key',
-                    'value',
                   ],
                   properties: {
                     key: {
@@ -62,6 +61,30 @@
                     },
                     value: {
                       type: 'string',
+                    },
+                    valueFrom: {
+                      properties: {
+                        secretKeyRef: {
+                          properties: {
+                            name: {
+                              type: 'string',
+                            },
+                            key: {
+                              type: 'string',
+                            },
+                          },
+                        },
+                        configMapKeyRef: {
+                          properties: {
+                            name: {
+                              type: 'string',
+                            },
+                            key: {
+                              type: 'string',
+                            },
+                          },
+                        },
+                      },
                     },
                   },
                 },

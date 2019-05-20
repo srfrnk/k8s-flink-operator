@@ -58,9 +58,22 @@ spec:
                     type: string
                   value:
                     type: string
+                  valueFrom:
+                    properties:
+                      configMapKeyRef:
+                        properties:
+                          key:
+                            type: string
+                          name:
+                            type: string
+                      secretKeyRef:
+                        properties:
+                          key:
+                            type: string
+                          name:
+                            type: string
                 required:
                 - key
-                - value
               type: array
             replicas:
               minimum: 0
@@ -93,7 +106,7 @@ kind: StatefulSet
 metadata:
   labels:
     ksonnet.io/component: statefulset
-    version: 190519-0556
+    version: 190520-1153
   name: flink-controller
   namespace: flink
 spec:
@@ -106,7 +119,7 @@ spec:
     metadata:
       labels:
         app: flink-controller
-        version: 190519-0556
+        version: 190520-1153
     spec:
       containers:
       - args:
@@ -116,8 +129,8 @@ spec:
         - -c
         env:
         - name: IMAGE_VERSION
-          value: 190519-0556
-        image: srfrnk/flink-controller-app:190519-0556
+          value: 190520-1153
+        image: srfrnk/flink-controller-app:190520-1153
         name: controller
         ports:
         - containerPort: 80

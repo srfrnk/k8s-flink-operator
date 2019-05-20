@@ -43,7 +43,8 @@ function getPod(jobName, spec) {
     const pod = JSON.parse(podJson);
     pod.metadata.labels.version = IMAGE_VERSION;
     pod.metadata.name = jobName;
-    const jobProps = spec.props.map(prop => `--${prop.key} ${prop.value}`).join(' ');
+    const props = getProps(spec.props);
+    jobProps = props.props;
     pod.spec.containers[0].env = [
         {
             "name": "jobName",
@@ -64,7 +65,8 @@ function getPod(jobName, spec) {
         {
             "name": "jobProps",
             "value": jobProps
-        }
+        },
+        ...props.env
     ];
     pod.spec.containers[1].env = [
         {
@@ -84,4 +86,52 @@ function getPod(jobName, spec) {
 function getConfigMap() {
     const configMap = JSON.parse(configMapJson);
     return configMap;
+}
+
+function getProps(specProps) {
+    const props = [];
+    const env = [];
+
+    for (const prop of specProps) {
+        const key = prop.key;
+        const value = prop.value;
+        if (!!prop.valueFrom) {
+            const valueFrom = prop.valueFrom;
+            if (!!valueFrom.configMapKeyRef) {
+                const configMapKeyRef = valueFrom.configMapKeyRef;
+                const envKey = `jobProps_${key}_configmap_${configMapKeyRef.name}_${configMapKeyRef.key}`;
+                key = `$\{${envKey}\}`;
+                env.push({
+                    "name": envKey,
+                    "valueFrom": {
+                        "configMapKeyRef": {
+                            "name": configMapKeyRef.name,
+                            "key": configMapKeyRef.key,
+                        }
+                    }
+                });
+            }
+            else if (!!valueFrom.secretKeyRef) {
+                const secretKeyRef = valueFrom.secretKeyRef;
+                const envKey = `jobProps_${key}_secret_${secretKeyRef.name}_${secretKeyRef.key}`;
+                key = `$\{${envKey}\}`;
+                env.push({
+                    "name": envKey,
+                    "valueFrom": {
+                        "secretKeyRef": {
+                            "name": secretKeyRef.name,
+                            "key": secretKeyRef.key,
+                        }
+                    }
+                });
+            }
+        }
+        props.push({
+            key: key,
+            value: value
+        });
+    }
+
+    const jobProps = props.map(prop => `--${prop.key} ${prop.value}`).join(' ');
+    return { props: jobProps, env: env }
 }
