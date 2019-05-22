@@ -93,37 +93,15 @@ function getProps(specProps) {
     const env = [];
 
     for (const prop of specProps) {
-        const key = prop.key;
-        const value = prop.value;
+        let key = prop.key;
+        let value = prop.value;
         if (!!prop.valueFrom) {
             const valueFrom = prop.valueFrom;
             if (!!valueFrom.configMapKeyRef) {
-                const configMapKeyRef = valueFrom.configMapKeyRef;
-                const envKey = `jobProps_${key}_configmap_${configMapKeyRef.name}_${configMapKeyRef.key}`;
-                key = `$\{${envKey}\}`;
-                env.push({
-                    "name": envKey,
-                    "valueFrom": {
-                        "configMapKeyRef": {
-                            "name": configMapKeyRef.name,
-                            "key": configMapKeyRef.key,
-                        }
-                    }
-                });
+                value = getRefValue(env, key, "configMapKeyRef", valueFrom.configMapKeyRef);
             }
             else if (!!valueFrom.secretKeyRef) {
-                const secretKeyRef = valueFrom.secretKeyRef;
-                const envKey = `jobProps_${key}_secret_${secretKeyRef.name}_${secretKeyRef.key}`;
-                key = `$\{${envKey}\}`;
-                env.push({
-                    "name": envKey,
-                    "valueFrom": {
-                        "secretKeyRef": {
-                            "name": secretKeyRef.name,
-                            "key": secretKeyRef.key,
-                        }
-                    }
-                });
+                value = getRefValue(env, key, "secretKeyRef", valueFrom.secretKeyRef);
             }
         }
         props.push({
@@ -134,4 +112,18 @@ function getProps(specProps) {
 
     const jobProps = props.map(prop => `--${prop.key} ${prop.value}`).join(' ');
     return { props: jobProps, env: env }
+}
+
+function getRefValue(env, key, type, ref) {
+    const envKey = `jobProps_${key}_${type}_${ref.name}_${ref.key}`.replace(/[\-\$]/gi, '_');
+    env.push({
+        "name": envKey,
+        "valueFrom": {
+            [type]: {
+                "name": ref.name,
+                "key": ref.key,
+            }
+        }
+    });
+    return `$\{${envKey}\}`;
 }
