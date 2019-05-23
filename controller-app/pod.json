@@ -8,8 +8,7 @@
         "name": "jobName"
     },
     "spec": {
-        "containers": [
-            {
+        "containers": [{
                 "command": [
                     "/app/start.sh"
                 ],
@@ -21,15 +20,10 @@
                             "/app/check.sh"
                         ]
                     },
-                    "initialDelaySeconds": 60,
+                    "initialDelaySeconds": 30,
                     "periodSeconds": 10
                 },
                 "name": "job",
-                "ports": [
-                    {
-                        "containerPort": 80
-                    }
-                ],
                 "resources": {
                     "limits": {
                         "cpu": "1000m",
@@ -40,12 +34,11 @@
                         "memory": "50Mi"
                     }
                 },
-                "volumeMounts": [
-                    {
-                        "name": "jar",
-                        "mountPath": "/jar"
-                    }
-                ]
+                "volumeMounts": [{
+                    "name": "jar",
+                    "mountPath": "/jar",
+                    "readOnly": true
+                }]
             },
             {
                 "image": "jarImage",
@@ -64,10 +57,10 @@
                         "memory": "10Mi"
                     }
                 },
-                "volumeMounts": [
-                    {
+                "volumeMounts": [{
                         "name": "jar-start",
-                        "mountPath": "/app"
+                        "mountPath": "/app",
+                        "readOnly": true
                     },
                     {
                         "name": "jar",
@@ -77,8 +70,7 @@
             }
         ],
         "terminationGracePeriodSeconds": 60,
-        "volumes": [
-            {
+        "volumes": [{
                 "name": "jar-start",
                 "configMap": {
                     "name": "flink-job-jar",

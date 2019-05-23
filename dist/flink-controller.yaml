@@ -106,7 +106,7 @@ kind: StatefulSet
 metadata:
   labels:
     ksonnet.io/component: statefulset
-    version: 190522-1205
+    version: 190523-0643
   name: flink-controller
   namespace: flink
 spec:
@@ -119,7 +119,7 @@ spec:
     metadata:
       labels:
         app: flink-controller
-        version: 190522-1205
+        version: 190523-0643
     spec:
       containers:
       - args:
@@ -129,8 +129,8 @@ spec:
         - -c
         env:
         - name: IMAGE_VERSION
-          value: 190522-1205
-        image: srfrnk/flink-controller-app:190522-1205
+          value: 190523-0643
+        image: srfrnk/flink-controller-app:190523-0643
         name: controller
         ports:
         - containerPort: 80

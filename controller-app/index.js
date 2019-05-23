@@ -32,17 +32,18 @@ app.listen(80, () => {
 });
 
 function getChildren(jobName, spec) {
-    const pods = Array(spec.replicas).fill(0).map((x, i) => getPod(`${jobName}-${i + 1}`, spec));
-    const configMap = getConfigMap();
+    const configMapName = `flink-job-jar-${jobName}`;
+    const pods = Array(spec.replicas).fill(0).map((x, i) => getPod(`${jobName}-${i + 1}`, configMapName, spec));
+    const configMap = getConfigMap(configMapName);
     return [configMap, ...pods];
 }
 
-function getPod(jobName, spec) {
+function getPod(jobName, configMapName, spec) {
     const jarDir = path.dirname(spec.jarPath);
     const jarName = path.basename(spec.jarPath);
     const pod = JSON.parse(podJson);
     pod.metadata.labels.version = IMAGE_VERSION;
-    pod.metadata.name = jobName;
+    pod.metadata.name = `flink-job-${jobName}`;
     const props = getProps(spec.props);
     jobProps = props.props;
     pod.spec.containers[0].env = [
@@ -80,11 +81,13 @@ function getPod(jobName, spec) {
     ];
     pod.spec.containers[0].image = `srfrnk/flink-job-app:${IMAGE_VERSION}`;
     pod.spec.containers[1].image = spec.jarImage;
+    pod.spec.volumes[0].configMap.name = configMapName;
     return pod;
 }
 
-function getConfigMap() {
+function getConfigMap(configMapName) {
     const configMap = JSON.parse(configMapJson);
+    configMap.metadata.name = configMapName;
     return configMap;
 }
 
