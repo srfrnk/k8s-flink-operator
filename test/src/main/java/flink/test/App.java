@@ -3,14 +3,13 @@
  */
 package flink.test;
 
-import java.util.Arrays;
 import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;
-import org.apache.beam.sdk.coders.StringUtf8Coder;
+import org.apache.beam.sdk.coders.AvroCoder;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
+import org.apache.beam.sdk.testing.TestStream;
 import org.apache.beam.sdk.transforms.Count;
-import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.MapElements;
 import org.apache.beam.sdk.transforms.ParDo;
@@ -26,8 +25,8 @@ public class App {
         String jobName = parameters.get("jobName", "Undefined-Name");
         String prop1 = parameters.get("envKey1", "-------");
         String prop2 = parameters.get("envKey2", "-------");
-        LOG.info("prop1:"+prop1);
-        LOG.info("prop2:"+prop2);
+        LOG.info("prop1:" + prop1);
+        LOG.info("prop2:" + prop2);
         FlinkPipelineOptions pipelineOptions =
                 PipelineOptionsFactory.create().as(FlinkPipelineOptions.class);
         pipelineOptions.setJobName(jobName);
@@ -35,11 +34,11 @@ public class App {
         pipelineOptions.setParallelism(1);
         pipelineOptions.setStreaming(false);
         Pipeline p = Pipeline.create(pipelineOptions);
-        p.apply(Create.of(Arrays.asList("To be, or not to be: that is the question:",
-                "Whether 'tis nobler in the mind to suffer", "The slings and arrows of fortune,",
-                "Or to take arms against a sea of troubles,")))
 
-                .setCoder(StringUtf8Coder.of())
+        p.apply(TestStream.create(AvroCoder.of(String.class)).addElements(
+            "To be, or not to be: that is the question:",
+            "Whether 'tis nobler in the mind to suffer", "The slings and arrows of fortune,",
+            "Or to take arms against a sea of troubles,").advanceWatermarkToInfinity())
 
                 .apply(ParDo.of(new DoFn<String, String>() {
                     private static final long serialVersionUID = 1;
@@ -66,15 +65,8 @@ public class App {
                 }))
 
                 .apply(MapElements.into(TypeDescriptors.strings()).via(word -> {
-                    try { Thread.sleep(1000); } catch (InterruptedException e) {}
+                    LOG.info("{}", word);
                     return word;
-                }))
-
-                .apply(Count.perElement())
-
-                .apply(MapElements.into(TypeDescriptors.strings()).via(kv -> {
-                    LOG.info("{} : {}", kv.getKey(), kv.getValue());
-                    return kv.getKey();
                 }));
 
         p.run();
