@@ -11,19 +11,20 @@ var app = express();
 app.use(bodyParser.json());
 
 app.post('/sync', function (req, res) {
-    console.log(JSON.stringify(req.body));
     const parent = req.body.parent;
     const children = req.body.children;
-    res.json({
+    const response = {
         "status": {
-            "pods": children["Pod.v1"].length
+            "replicas": `${Object.keys(children["Pod.v1"]).length}/${parent.spec.replicas}`,
         },
         "children": getChildren(parent.metadata.name, parent.spec)
-    });
+    };
+    console.log(JSON.stringify({ type: "SYNC", req: req.body, res: response }), ",");
+    res.json(response);
 });
 
 app.all("**", (req, res) => {
-    console.log(JSON.stringify(req.body));
+    console.log(JSON.stringify({ type: "CATCHALL", req: req.body, res: {} }));
     res.json({});
 })
 

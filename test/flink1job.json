@@ -7,7 +7,7 @@
     "spec": {
         "replicas": 1,
         "jobManagerUrl": "flink-jobmanager:8081",
-        "jarImage": "flink-test:v1",
+        "jarImage": "flink-test:IMAGE_VERSION",
         "jarPath": "/jars/flink-test.jar",
         "mainClass": "flink.test.App",
         "props": [
