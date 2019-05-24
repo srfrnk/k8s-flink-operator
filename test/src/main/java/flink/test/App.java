@@ -3,21 +3,120 @@
  */
 package flink.test;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.NoSuchElementException;
 import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.coders.AvroCoder;
+import org.apache.beam.sdk.coders.Coder;
+import org.apache.beam.sdk.io.Read;
+import org.apache.beam.sdk.io.UnboundedSource;
+import org.apache.beam.sdk.io.UnboundedSource.CheckpointMark;
+import org.apache.beam.sdk.io.UnboundedSource.UnboundedReader;
+import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
-import org.apache.beam.sdk.testing.TestStream;
-import org.apache.beam.sdk.transforms.Count;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.MapElements;
 import org.apache.beam.sdk.transforms.ParDo;
+import org.apache.beam.sdk.transforms.windowing.BoundedWindow;
 import org.apache.beam.sdk.values.TypeDescriptors;
 import org.apache.flink.api.java.utils.ParameterTool;
+import org.joda.time.Instant;
 import org.slf4j.LoggerFactory;
 
 public class App {
+    static class StreamingStringMark implements UnboundedSource.CheckpointMark {
+        @Override
+        public void finalizeCheckpoint() throws IOException {
+
+        }
+    }
+
+    static class StreamingStringSource extends UnboundedSource<String, StreamingStringMark> {
+        private static final long serialVersionUID = 1L;
+        private String[] strings;
+
+        public StreamingStringSource(String[] strings) {
+            this.strings = strings;
+        }
+
+        @Override
+        public List<? extends UnboundedSource<String, StreamingStringMark>> split(int desiredNumSplits,
+                PipelineOptions options) throws Exception {
+            return Arrays.asList(this);
+        }
+
+        @Override
+        public UnboundedReader<String> createReader(PipelineOptions options,
+                StreamingStringMark checkpointMark) throws IOException {
+            return new StreamingStringReader(this);
+        }
+
+        @Override
+        public Coder<StreamingStringMark> getCheckpointMarkCoder() {
+            return AvroCoder.of(StreamingStringMark.class);
+        }
+
+        @Override
+        public Coder<String> getOutputCoder() {
+            return AvroCoder.of(String.class);
+        }
+    }
+
+    static class StreamingStringReader extends UnboundedReader<String> {
+
+        private StreamingStringSource source;
+        private int idx = 0;
+
+        public StreamingStringReader(StreamingStringSource source) {
+            this.source = source;
+        }
+
+        @Override
+        public boolean start() throws IOException {
+            this.idx = 0;
+            return true;
+        }
+
+        @Override
+        public boolean advance() throws IOException {
+            this.idx++;
+            return idx%100==0;
+        }
+
+        @Override
+        public Instant getWatermark() {
+            return Instant.now().plus(idx * 100);
+        }
+
+        @Override
+        public CheckpointMark getCheckpointMark() {
+            return new StreamingStringMark();
+        }
+
+        @Override
+        public UnboundedSource<String, ?> getCurrentSource() {
+            return source;
+        }
+
+        @Override
+        public String getCurrent() throws NoSuchElementException {
+            return this.source.strings[this.idx % this.source.strings.length];
+        }
+
+        @Override
+        public Instant getCurrentTimestamp() throws NoSuchElementException {
+            return BoundedWindow.TIMESTAMP_MIN_VALUE;
+        }
+
+        @Override
+        public void close() throws IOException {
+        }
+    }
+
     private static org.slf4j.Logger LOG = LoggerFactory.getLogger(App.class);
 
     public static void main(String[] args) {
@@ -32,13 +131,14 @@ public class App {
         pipelineOptions.setJobName(jobName);
         pipelineOptions.setRunner(FlinkRunner.class);
         pipelineOptions.setParallelism(1);
-        pipelineOptions.setStreaming(false);
+        pipelineOptions.setStreaming(true);
         Pipeline p = Pipeline.create(pipelineOptions);
 
-        p.apply(TestStream.create(AvroCoder.of(String.class)).addElements(
-            "To be, or not to be: that is the question:",
-            "Whether 'tis nobler in the mind to suffer", "The slings and arrows of fortune,",
-            "Or to take arms against a sea of troubles,").advanceWatermarkToInfinity())
+        String[] strings = new String[] {"To be, or not to be: that is the question:",
+                "Whether 'tis nobler in the mind to suffer", "The slings and arrows of fortune,",
+                "Or to take arms against a sea of troubles,"};
+
+        p.apply(Read.from(new StreamingStringSource(strings)))
 
                 .apply(ParDo.of(new DoFn<String, String>() {
                     private static final long serialVersionUID = 1;
