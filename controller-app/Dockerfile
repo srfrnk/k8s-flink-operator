@@ -2,7 +2,7 @@ FROM node
 
 ADD index.js /app/index.js
 ADD package.json /app/package.json
-ADD pod.json /app/pod.json
+ADD statefulset.json /app/statefulset.json
 ADD configmap.json /app/configmap.json
 
 WORKDIR /app

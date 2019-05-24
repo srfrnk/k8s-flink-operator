@@ -13,25 +13,17 @@
     },
     childResources: [
       {
-        apiVersion: 'v1',
-        resource: 'pods',
+        apiVersion: 'apps/v1',
+        resource: 'statefulsets',
         updateStrategy: {
-          method: 'RollingRecreate',
-          statusChecks: {
-            conditions: [
-              {
-                type: 'Ready',
-                status: 'True',
-              },
-            ],
-          },
+          method: 'InPlace',
         },
       },
       {
         apiVersion: 'v1',
         resource: 'configmaps',
         updateStrategy: {
-          method: 'Recreate',
+          method: 'OnDelete',
         },
       },
     ],

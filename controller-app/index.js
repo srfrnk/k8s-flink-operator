@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 
 const IMAGE_VERSION = process.env.IMAGE_VERSION || "latest";
-const podJson = fs.readFileSync('pod.json', { encoding: 'utf8' });
+const statefulsetJson = fs.readFileSync('statefulset.json', { encoding: 'utf8' });
 const configMapJson = fs.readFileSync('configmap.json', { encoding: 'utf8' });
 
 var app = express();
@@ -12,11 +12,9 @@ app.use(bodyParser.json());
 
 app.post('/sync', function (req, res) {
     const parent = req.body.parent;
-    const children = req.body.children;
+    // const children = req.body.children;
     const response = {
-        "status": {
-            "replicas": `${Object.keys(children["Pod.v1"]).length}/${parent.spec.replicas}`,
-        },
+        "status": {},
         "children": getChildren(parent.metadata.name, parent.spec)
     };
     console.log(JSON.stringify({ type: "SYNC", req: req.body, res: response }), ",");
@@ -34,20 +32,28 @@ app.listen(80, () => {
 
 function getChildren(jobName, spec) {
     const configMapName = `flink-job-jar-${jobName}`;
-    const pods = Array(spec.replicas).fill(0).map((x, i) => getPod(`${jobName}-${i + 1}`, configMapName, spec));
+    const statefulset = getStatefulset(jobName, configMapName, spec);
     const configMap = getConfigMap(configMapName);
-    return [configMap, ...pods];
+    return [configMap, statefulset];
 }
 
-function getPod(jobName, configMapName, spec) {
+function getStatefulset(jobName, configMapName, spec) {
     const jarDir = path.dirname(spec.jarPath);
     const jarName = path.basename(spec.jarPath);
-    const pod = JSON.parse(podJson);
-    pod.metadata.labels.version = IMAGE_VERSION;
-    pod.metadata.name = `flink-job-${jobName}`;
+    const statefulset = JSON.parse(statefulsetJson);
+
+    statefulset.metadata.name = `flink-job-${jobName}`;
+    statefulset.metadata.labels.version = IMAGE_VERSION;
+    statefulset.spec.replicas = spec.replicas;
+    statefulset.spec.selector["flink-job"] = jobName;
+    statefulset.spec.selector.version = IMAGE_VERSION;
+    statefulset.spec.template.metadata["flink-job"] = jobName;
+    statefulset.spec.template.metadata.version = IMAGE_VERSION;
+
     const props = getProps(spec.props);
     jobProps = props.props;
-    pod.spec.containers[0].env = [
+    podSpec = statefulset.spec.template.spec;
+    podSpec.containers[0].env = [
         {
             "name": "jobName",
             "value": jobName
@@ -70,7 +76,7 @@ function getPod(jobName, configMapName, spec) {
         },
         ...props.env
     ];
-    pod.spec.containers[1].env = [
+    podSpec.containers[1].env = [
         {
             "name": "jarDir",
             "value": jarDir
@@ -80,10 +86,10 @@ function getPod(jobName, configMapName, spec) {
             "value": jarName
         }
     ];
-    pod.spec.containers[0].image = `srfrnk/flink-job-app:${IMAGE_VERSION}`;
-    pod.spec.containers[1].image = spec.jarImage;
-    pod.spec.volumes[0].configMap.name = configMapName;
-    return pod;
+    podSpec.containers[0].image = `srfrnk/flink-job-app:${IMAGE_VERSION}`;
+    podSpec.containers[1].image = spec.jarImage;
+    podSpec.volumes[0].configMap.name = configMapName;
+    return statefulset;
 }
 
 function getConfigMap(configMapName) {
