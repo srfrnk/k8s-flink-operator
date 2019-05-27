@@ -26,17 +26,12 @@
         properties: {
           spec: {
             required: [
-              'replicas',
               'jobManagerUrl',
               'jarImage',
               'jarPath',
               'mainClass',
             ],
             properties: {
-              replicas: {
-                minimum: 0,
-                type: 'integer',
-              },
               jobManagerUrl: {
                 type: 'string',
               },
@@ -48,6 +43,30 @@
               },
               mainClass: {
                 type: 'string',
+              },
+              streaming: {
+                required: [
+                  'replicas',
+                ],
+                properties: {
+                  replicas: {
+                    minimum: 0,
+                    type: 'integer',
+                  },
+                },
+              },
+              cron: {
+                required: [
+                  'schedule',
+                ],
+                properties: {
+                  concurrencyPolicy: {
+                    type: 'string',
+                  },
+                  schedule: {
+                    type: 'string',
+                  },
+                },
               },
               props: {
                 type: 'array',
@@ -95,12 +114,6 @@
       },
     },
     additionalPrinterColumns: [
-      {
-        name: 'Replicas',
-        type: 'integer',
-        description: 'Number of job replicas',
-        JSONPath: '.spec.replicas',
-      },
       {
         name: 'Age',
         type: 'date',

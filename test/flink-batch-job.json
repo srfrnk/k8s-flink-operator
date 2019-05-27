@@ -1,0 +1,28 @@
+{
+    "apiVersion": "operators.srfrnk.com/v1",
+    "kind": "FlinkJob",
+    "metadata": {
+        "name": "flink-batch-job"
+    },
+    "spec": {
+        "replicas": 1,
+        "jobManagerUrl": "flink-jobmanager:8081",
+        "jarImage": "flink-test:IMAGE_VERSION",
+        "jarPath": "/jars/flink-test.jar",
+        "mainClass": "flink.test.AppBatch",
+        "cron": {
+            "schedule": "*/5 * * * *",
+            "concurrencyPolicy": "Allow"
+        },
+        "props": [
+            {
+                "key": "envKey1",
+                "value": "value1"
+            },
+            {
+                "key": "envKey2",
+                "value": "value2"
+            }
+        ]
+    }
+}

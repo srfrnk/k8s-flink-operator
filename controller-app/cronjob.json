@@ -1,0 +1,30 @@
+{
+    "apiVersion": "batch/v1beta1",
+    "kind": "CronJob",
+    "metadata": {
+        "name": "",
+        "labels": {
+            "version": ""
+        }
+    },
+    "spec": {
+        "concurrencyPolicy": "",
+        "schedule": "",
+        "successfulJobsHistoryLimit": 0,
+        "failedJobsHistoryLimit": 0,
+        "jobTemplate": {
+            "metadata": {
+                "name": "",
+                "labels": {
+                    "version": ""
+                }
+            },
+            "spec": {
+                "ttlSecondsAfterFinished": 30,
+                "completions": 1,
+                "parallelism": 1,
+                "template": {}
+            }
+        }
+    }
+}

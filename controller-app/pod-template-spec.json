@@ -1,0 +1,86 @@
+{
+    "metadata": {
+        "labels": {
+            "flink-job": "",
+            "version": ""
+        }
+    },
+    "spec": {
+        "containers": [
+            {
+                "command": [],
+                "env": [],
+                "image": "",
+                "livenessProbe": {
+                    "exec": {
+                        "command": [
+                            "/app/check.sh"
+                        ]
+                    },
+                    "initialDelaySeconds": 30,
+                    "periodSeconds": 10
+                },
+                "name": "job",
+                "resources": {
+                    "limits": {
+                        "cpu": "1000m",
+                        "memory": "500Mi"
+                    },
+                    "requests": {
+                        "cpu": "100m",
+                        "memory": "50Mi"
+                    }
+                },
+                "volumeMounts": [
+                    {
+                        "name": "jar",
+                        "mountPath": "/jar",
+                        "readOnly": true
+                    }
+                ]
+            },
+            {
+                "image": "",
+                "command": [],
+                "env": [],
+                "name": "jar",
+                "resources": {
+                    "limits": {
+                        "cpu": "1m",
+                        "memory": "100Mi"
+                    },
+                    "requests": {
+                        "cpu": "1m",
+                        "memory": "10Mi"
+                    }
+                },
+                "volumeMounts": [
+                    {
+                        "name": "jar-start",
+                        "mountPath": "/app",
+                        "readOnly": true
+                    },
+                    {
+                        "name": "jar",
+                        "mountPath": "/jar"
+                    }
+                ]
+            }
+        ],
+        "restartPolicy": "",
+        "terminationGracePeriodSeconds": 60,
+        "volumes": [
+            {
+                "name": "jar-start",
+                "configMap": {
+                    "name": "",
+                    "defaultMode": 484
+                }
+            },
+            {
+                "name": "jar",
+                "emptyDir": {}
+            }
+        ]
+    }
+}

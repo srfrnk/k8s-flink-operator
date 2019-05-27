@@ -20,6 +20,13 @@
         },
       },
       {
+        apiVersion: 'batch/v1beta1',
+        resource: 'cronjobs',
+        updateStrategy: {
+          method: 'InPlace',
+        },
+      },
+      {
         apiVersion: 'v1',
         resource: 'configmaps',
         updateStrategy: {

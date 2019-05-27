@@ -15,10 +15,6 @@ metadata:
   namespace: flink
 spec:
   additionalPrinterColumns:
-  - JSONPath: .spec.replicas
-    description: Number of job replicas
-    name: Replicas
-    type: integer
   - JSONPath: .metadata.creationTimestamp
     description: Time since object was created
     name: Age
@@ -43,6 +39,14 @@ spec:
       properties:
         spec:
           properties:
+            cron:
+              properties:
+                concurrencyPolicy:
+                  type: string
+                schedule:
+                  type: string
+              required:
+              - schedule
             jarImage:
               type: string
             jarPath:
@@ -75,11 +79,14 @@ spec:
                 required:
                 - key
               type: array
-            replicas:
-              minimum: 0
-              type: integer
+            streaming:
+              properties:
+                replicas:
+                  minimum: 0
+                  type: integer
+              required:
+              - replicas
           required:
-          - replicas
           - jobManagerUrl
           - jarImage
           - jarPath
@@ -106,7 +113,7 @@ kind: StatefulSet
 metadata:
   labels:
     ksonnet.io/component: statefulset
-    version: 190524-1428
+    version: 190527-1809
   name: flink-controller
   namespace: flink
 spec:
@@ -119,7 +126,7 @@ spec:
     metadata:
       labels:
         app: flink-controller
-        version: 190524-1428
+        version: 190527-1809
     spec:
       containers:
       - args:
@@ -129,8 +136,8 @@ spec:
         - -c
         env:
         - name: IMAGE_VERSION
-          value: 190524-1428
-        image: srfrnk/flink-controller-app:190524-1428
+          value: 190527-1809
+        image: srfrnk/flink-controller-app:190527-1809
         name: controller
         ports:
         - containerPort: 80
@@ -153,6 +160,10 @@ spec:
   childResources:
   - apiVersion: apps/v1
     resource: statefulsets
+    updateStrategy:
+      method: InPlace
+  - apiVersion: batch/v1beta1
+    resource: cronjobs
     updateStrategy:
       method: InPlace
   - apiVersion: v1

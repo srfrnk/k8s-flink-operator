@@ -5,6 +5,7 @@
       "name": "flink-job-jar"
    },
    "data": {
-      "start.sh": "#!/usr/bin/env sh\ntrap 'break;' TERM INT \n echo 'Copying jar...' \n cp ${jarDir}/${jarName} /jar/temp.jar \n mv /jar/temp.jar /jar/${jarName} \n echo 'Started' \n while :; do sleep 1; done \n echo 'Exiting'"
+      "start-streaming.sh": "#!/usr/bin/env sh\ntrap 'break;' TERM INT \n echo 'Copying jar...' \n cp ${jarDir}/${jarName} /jar/temp.jar \n mv /jar/temp.jar /jar/${jarName} \n echo 'Started' \n while :; do sleep 1; done \n echo 'Exiting'",
+      "start-batch.sh": "#!/usr/bin/env sh\ntrap 'break;' TERM INT \n echo 'Copying jar...' \n cp ${jarDir}/${jarName} /jar/temp.jar \n mv /jar/temp.jar /jar/${jarName} \n echo 'Exiting'"
    }
 }

@@ -5,14 +5,16 @@ const fs = require('fs');
 
 const IMAGE_VERSION = process.env.IMAGE_VERSION || "latest";
 const statefulsetJson = fs.readFileSync('statefulset.json', { encoding: 'utf8' });
+const cronjobJson = fs.readFileSync('cronjob.json', { encoding: 'utf8' });
 const configMapJson = fs.readFileSync('configmap.json', { encoding: 'utf8' });
+const podTemplateSpecJson = fs.readFileSync('pod-template-spec.json', { encoding: 'utf8' });
 
 var app = express();
 app.use(bodyParser.json());
 
 app.post('/sync', function (req, res) {
     const parent = req.body.parent;
-    // const children = req.body.children;
+    const children = req.body.children;
     const response = {
         "status": {},
         "children": getChildren(parent.metadata.name, parent.spec)
@@ -24,7 +26,7 @@ app.post('/sync', function (req, res) {
 app.all("**", (req, res) => {
     console.log(JSON.stringify({ type: "CATCHALL", req: req.body, res: {} }));
     res.json({});
-})
+});
 
 app.listen(80, () => {
     console.log("Flink controller running!");
@@ -32,27 +34,65 @@ app.listen(80, () => {
 
 function getChildren(jobName, spec) {
     const configMapName = `flink-job-jar-${jobName}`;
-    const statefulset = getStatefulset(jobName, configMapName, spec);
+    const controller = getController(jobName, configMapName, spec);
     const configMap = getConfigMap(configMapName);
-    return [configMap, statefulset];
+    return [configMap, controller];
+}
+
+function getController(jobName, configMapName, spec) {
+    if (!!spec.streaming) {
+        return getStatefulset(jobName, configMapName, spec);
+    }
+
+    if (!!spec.cron) {
+        return getCronJob(jobName, configMapName, spec);
+    }
+
+    console.log(`Job '${jobName}': Must specify either 'streaming' or 'cron' properties in spec. No controller is created for job.`);
 }
 
 function getStatefulset(jobName, configMapName, spec) {
-    const jarDir = path.dirname(spec.jarPath);
-    const jarName = path.basename(spec.jarPath);
     const statefulset = JSON.parse(statefulsetJson);
 
     statefulset.metadata.name = `flink-job-${jobName}`;
     statefulset.metadata.labels.version = IMAGE_VERSION;
-    statefulset.spec.replicas = spec.replicas;
+    statefulset.spec.replicas = spec.streaming.replicas;
     statefulset.spec.selector["flink-job"] = jobName;
     statefulset.spec.selector.version = IMAGE_VERSION;
-    statefulset.spec.template.metadata["flink-job"] = jobName;
-    statefulset.spec.template.metadata.version = IMAGE_VERSION;
+    statefulset.spec.template = getPodTemplateSpec(jobName, configMapName, spec, true);
 
+    return statefulset;
+}
+
+
+function getCronJob(jobName, configMapName, spec) {
+    const cronjob = JSON.parse(cronjobJson);
+
+    const name = `flink-job-${jobName}`;
+    cronjob.metadata.name = name;
+    cronjob.metadata.labels.version = IMAGE_VERSION;
+    cronjob.spec.concurrencyPolicy = spec.cron.concurrencyPolicy || 'Allow';
+    cronjob.spec.schedule = spec.cron.schedule;
+    cronjob.spec.jobTemplate.metadata.name = name;
+    cronjob.spec.jobTemplate.metadata.labels.version = IMAGE_VERSION;
+    cronjob.spec.jobTemplate.spec.template = getPodTemplateSpec(jobName, configMapName, spec, false);
+    delete cronjob.spec.jobTemplate.spec.template.spec.containers[0].livenessProbe;
+
+    return cronjob;
+}
+
+function getPodTemplateSpec(jobName, configMapName, spec, streaming) {
+    const podTemplateSpec = JSON.parse(podTemplateSpecJson);
+
+    podTemplateSpec.metadata["flink-job"] = jobName;
+    podTemplateSpec.metadata.version = IMAGE_VERSION;
+
+    const jarDir = path.dirname(spec.jarPath);
+    const jarName = path.basename(spec.jarPath);
     const props = getProps(spec.props);
-    jobProps = props.props;
-    podSpec = statefulset.spec.template.spec;
+    const jobProps = props.props;
+    const podSpec = podTemplateSpec.spec;
+
     podSpec.containers[0].env = [
         {
             "name": "jobName",
@@ -89,7 +129,19 @@ function getStatefulset(jobName, configMapName, spec) {
     podSpec.containers[0].image = `srfrnk/flink-job-app:${IMAGE_VERSION}`;
     podSpec.containers[1].image = spec.jarImage;
     podSpec.volumes[0].configMap.name = configMapName;
-    return statefulset;
+
+    if (streaming) {
+        podSpec.containers[0].command = ["/app/start-streaming.sh"];
+        podSpec.containers[1].command = ["/app/start-streaming.sh"];
+        podSpec.restartPolicy = "Always";
+    }
+    else {
+        podSpec.containers[0].command = ["/app/start-batch.sh"];
+        podSpec.containers[1].command = ["/app/start-batch.sh"];
+        podSpec.restartPolicy = "Never";
+    }
+
+    return podTemplateSpec;
 }
 
 function getConfigMap(configMapName) {
@@ -121,7 +173,7 @@ function getProps(specProps) {
     }
 
     const jobProps = props.map(prop => `--${prop.key} ${prop.value}`).join(' ');
-    return { props: jobProps, env: env }
+    return { props: jobProps, env: env };
 }
 
 function getRefValue(env, key, type, ref) {

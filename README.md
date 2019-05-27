@@ -49,11 +49,20 @@ Please see the [Example Apache BEAM Pipeline](https://github.com/srfrnk/k8s-flin
 
 The spec must include:
 
-- `replicas`: number of jobs to submit simultaneously
 - `jobManagerUrl`: Cluster URL to `Flink Job Manager` ("host:port")
 - `jarImage`:Full image identifier ("repo/image:tag")
 - `jarPath`:Absolute path to `JAR` inside image
 - `mainClass`:Full class-name for the job (e.g. "org.example.MyClass")
+- Either `streaming` or `cron` : For streaming job or batch job
+
+`streaming` should include
+
+- `replicas`: number of jobs to submit simultaneously
+
+`cron` should include
+
+- `schedule`: The schedule in Cron format. [See here](https://en.wikipedia.org/wiki/Cron)
+- `concurrencyPolicy`: Specifies how to treat concurrent executions of a Job. Valid values are: - "Allow" (default): allows CronJobs to run concurrently; - "Forbid": forbids concurrent runs, skipping next run if previous run hasn't finished yet; - "Replace": cancels currently running job and replaces it with a new one. [See here](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.14/#cronjobspec-v1beta1-batch)
 
 The following are optional:
 

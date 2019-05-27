@@ -27,7 +27,7 @@ import org.apache.flink.api.java.utils.ParameterTool;
 import org.joda.time.Instant;
 import org.slf4j.LoggerFactory;
 
-public class App {
+public class AppStreaming {
     static class StreamingStringMark implements UnboundedSource.CheckpointMark {
         @Override
         public void finalizeCheckpoint() throws IOException {
@@ -44,8 +44,8 @@ public class App {
         }
 
         @Override
-        public List<? extends UnboundedSource<String, StreamingStringMark>> split(int desiredNumSplits,
-                PipelineOptions options) throws Exception {
+        public List<? extends UnboundedSource<String, StreamingStringMark>> split(
+                int desiredNumSplits, PipelineOptions options) throws Exception {
             return Arrays.asList(this);
         }
 
@@ -84,7 +84,7 @@ public class App {
         @Override
         public boolean advance() throws IOException {
             this.idx++;
-            return idx%100==0;
+            return idx % 100 == 0;
         }
 
         @Override
@@ -117,7 +117,7 @@ public class App {
         }
     }
 
-    private static org.slf4j.Logger LOG = LoggerFactory.getLogger(App.class);
+    private static org.slf4j.Logger LOG = LoggerFactory.getLogger(AppStreaming.class);
 
     public static void main(String[] args) {
         ParameterTool parameters = ParameterTool.fromArgs(args);

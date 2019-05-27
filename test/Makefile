@@ -5,4 +5,5 @@ deploy-minikube: FORCE
 	kubectl apply -f flink.json
 	gradle build
 	eval $$(minikube docker-env) && docker build . -t flink-test:${TIMESTAMP}
-	cat flink1job.json | sed "s/IMAGE_VERSION/${TIMESTAMP}/" | kubectl apply -f -
+	cat flink-streaming-job.json | sed "s/IMAGE_VERSION/${TIMESTAMP}/" | kubectl apply -f -
+	cat flink-batch-job.json | sed "s/IMAGE_VERSION/${TIMESTAMP}/" | kubectl apply -f -
