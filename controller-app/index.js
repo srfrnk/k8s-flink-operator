@@ -93,11 +93,17 @@ function getPodTemplateSpec(jobName, configMapName, spec, streaming) {
     const jobProps = props.props;
     const podSpec = podTemplateSpec.spec;
 
+    const jobNameEnv = { "name": "jobName" };
+
+    if (streaming) {
+        jobNameEnv.valueFrom = { fieldRef: { fieldPath: "metadata.name" } };
+    }
+    else {
+        jobNameEnv.value = jobName;
+    }
+
     podSpec.containers[0].env = [
-        {
-            "name": "jobName",
-            "value": jobName
-        },
+        jobNameEnv,
         {
             "name": "jobManagerUrl",
             "value": spec.jobManagerUrl
