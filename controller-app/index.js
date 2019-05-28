@@ -57,8 +57,8 @@ function getStatefulset(jobName, configMapName, spec) {
     statefulset.metadata.name = `flink-job-${jobName}`;
     statefulset.metadata.labels.version = IMAGE_VERSION;
     statefulset.spec.replicas = spec.streaming.replicas;
-    statefulset.spec.selector["flink-job"] = jobName;
-    statefulset.spec.selector.version = IMAGE_VERSION;
+    statefulset.spec.selector.matchLabels["flink-job"] = jobName;
+    statefulset.spec.selector.matchLabels.version = IMAGE_VERSION;
     statefulset.spec.template = getPodTemplateSpec(jobName, configMapName, spec, true);
 
     return statefulset;
@@ -84,8 +84,8 @@ function getCronJob(jobName, configMapName, spec) {
 function getPodTemplateSpec(jobName, configMapName, spec, streaming) {
     const podTemplateSpec = JSON.parse(podTemplateSpecJson);
 
-    podTemplateSpec.metadata["flink-job"] = jobName;
-    podTemplateSpec.metadata.version = IMAGE_VERSION;
+    podTemplateSpec.metadata.labels["flink-job"] = jobName;
+    podTemplateSpec.metadata.labels.version = IMAGE_VERSION;
 
     const jarDir = path.dirname(spec.jarPath);
     const jarName = path.basename(spec.jarPath);
@@ -147,6 +147,7 @@ function getPodTemplateSpec(jobName, configMapName, spec, streaming) {
 function getConfigMap(configMapName) {
     const configMap = JSON.parse(configMapJson);
     configMap.metadata.name = configMapName;
+    configMap.metadata.labels.version = IMAGE_VERSION;
     return configMap;
 }
 
