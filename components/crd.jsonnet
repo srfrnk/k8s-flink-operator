@@ -108,6 +108,16 @@
                   },
                 },
               },
+              volumeMounts: {
+                required: [
+                  'volume',
+                  'mount',
+                ],
+                properties: {
+                  volume: {},
+                  mount: {},
+                },
+              },
             },
           },
         },

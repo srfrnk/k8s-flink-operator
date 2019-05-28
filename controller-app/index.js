@@ -147,6 +147,15 @@ function getPodTemplateSpec(jobName, configMapName, spec, streaming) {
         podSpec.restartPolicy = "Never";
     }
 
+    for (const volumeMount of (spec.volumeMounts || [])) {
+        const volumeName = `volume-${Math.floor(Math.random() * 10e10)}`;
+        volumeMount.volume.name = volumeName;
+        volumeMount.mount.name = volumeName;
+
+        podSpec.volumes.push(volumeMount.volume);
+        podSpec.containers[0].volumeMounts.push(volumeMount.mount);
+    }
+
     return podTemplateSpec;
 }
 

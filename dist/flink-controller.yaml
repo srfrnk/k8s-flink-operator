@@ -86,6 +86,13 @@ spec:
                   type: integer
               required:
               - replicas
+            volumeMounts:
+              properties:
+                mount: {}
+                volume: {}
+              required:
+              - volume
+              - mount
           required:
           - jobManagerUrl
           - jarImage
@@ -113,7 +120,7 @@ kind: StatefulSet
 metadata:
   labels:
     ksonnet.io/component: statefulset
-    version: 190528-0450
+    version: 190528-1314
   name: flink-controller
   namespace: flink
 spec:
@@ -126,7 +133,7 @@ spec:
     metadata:
       labels:
         app: flink-controller
-        version: 190528-0450
+        version: 190528-1314
     spec:
       containers:
       - args:
@@ -136,8 +143,8 @@ spec:
         - -c
         env:
         - name: IMAGE_VERSION
-          value: 190528-0450
-        image: srfrnk/flink-controller-app:190528-0450
+          value: 190528-1314
+        image: srfrnk/flink-controller-app:190528-1314
         name: controller
         ports:
         - containerPort: 80

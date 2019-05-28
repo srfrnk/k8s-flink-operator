@@ -20,7 +20,7 @@
                 }
             },
             "spec": {
-                "ttlSecondsAfterFinished": 30,
+                "_ttlSecondsAfterFinished": 30,
                 "completions": 1,
                 "parallelism": 1,
                 "template": {}
