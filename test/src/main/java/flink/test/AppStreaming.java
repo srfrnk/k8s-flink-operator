@@ -124,8 +124,8 @@ public class AppStreaming {
         String jobName = parameters.get("jobName", "Undefined-Name");
         String prop1 = parameters.get("envKey1", "-------");
         String prop2 = parameters.get("envKey2", "-------");
-        LOG.info("prop1:" + prop1);
-        LOG.info("prop2:" + prop2);
+        LOG.info("prop1: {}", prop1);
+        LOG.info("prop2: {}", prop2);
         FlinkPipelineOptions pipelineOptions =
                 PipelineOptionsFactory.create().as(FlinkPipelineOptions.class);
         pipelineOptions.setJobName(jobName);

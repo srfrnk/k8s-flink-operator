@@ -36,8 +36,8 @@ public class AppBatch {
         String jobName = parameters.get("jobName", "Undefined-Name");
         String prop1 = parameters.get("envKey1", "-------");
         String prop2 = parameters.get("envKey2", "-------");
-        LOG.info("prop1:" + prop1);
-        LOG.info("prop2:" + prop2);
+        LOG.info("prop1: {}", prop1);
+        LOG.info("prop2: {}", prop2);
         FlinkPipelineOptions pipelineOptions =
                 PipelineOptionsFactory.create().as(FlinkPipelineOptions.class);
         pipelineOptions.setJobName(jobName);
@@ -48,7 +48,7 @@ public class AppBatch {
 
         p.apply(Create.of("To be, or not to be: that is the question:",
                 "Whether 'tis nobler in the mind to suffer", "The slings and arrows of fortune,",
-                "Or to take arms against a sea of troubles,"))  
+                "Or to take arms against a sea of troubles,"))
 
                 .apply(ParDo.of(new DoFn<String, String>() {
                     private static final long serialVersionUID = 1;
