@@ -8,9 +8,15 @@
 **Note** To install `metacontroller` you can usually just run these:
 
 ```bash
-kubectl create namespace metacontroller
+kubectl create namespace `metacontroller`
 kubectl apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/metacontroller/master/manifests/metacontroller-rbac.yaml
 kubectl apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/metacontroller/master/manifests/metacontroller.yaml
+```
+
+Optionally you can use the following to reduce log flood coming from `Metacontroller`:
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/srfrnk/metacontroller/master/manifests/metacontroller.yaml
 ```
 
 ## Installation
