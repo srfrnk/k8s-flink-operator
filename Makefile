@@ -23,4 +23,4 @@ publish: FORCE
 	docker push srfrnk/flink-controller-app:${TIMESTAMP}
 	docker push srfrnk/flink-job-app:${TIMESTAMP}
 
-	ks show minikube -V IMAGE_VERSION=$(TIMESTAMP) > dist/flink-controller.yaml
+	ks show publish -V IMAGE_VERSION=$(TIMESTAMP) > dist/flink-controller.yaml

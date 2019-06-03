@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const fs = require('fs');
 
+const DEBUG_LOG = process.env.DEBUG_LOG === 'true';
 const IMAGE_VERSION = process.env.IMAGE_VERSION || "latest";
 const statefulsetJson = fs.readFileSync('statefulset.json', { encoding: 'utf8' });
 const cronjobJson = fs.readFileSync('cronjob.json', { encoding: 'utf8' });
@@ -14,17 +15,21 @@ app.use(bodyParser.json());
 
 app.post('/sync', function (req, res) {
     const parent = req.body.parent;
-    const children = req.body.children;
+    // const children = req.body.children;
     const response = {
         "status": {},
         "children": getChildren(parent.metadata.name, parent.spec)
     };
-    console.log(JSON.stringify({ type: "SYNC", req: req.body, res: response }), ",");
+    if (DEBUG_LOG) {
+        console.log(JSON.stringify({ type: "SYNC", req: req.body, res: response }), ",");
+    }
     res.json(response);
 });
 
 app.all("**", (req, res) => {
-    console.log(JSON.stringify({ type: "CATCHALL", req: req.body, res: {} }));
+    if (DEBUG_LOG) {
+        console.log(JSON.stringify({ type: "CATCHALL", req: req.body, res: {} }));
+    }
     res.json({});
 });
 
@@ -104,6 +109,10 @@ function getPodTemplateSpec(jobName, configMapName, spec, streaming) {
 
     podSpec.containers[0].env = [
         jobNameEnv,
+        {
+            "name": "DEBUG_LOG",
+            "value": '${DEBUG_LOG}'
+        },
         {
             "name": "jobManagerUrl",
             "value": spec.jobManagerUrl

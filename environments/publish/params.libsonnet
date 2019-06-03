@@ -8,7 +8,7 @@ local envParams = params {
     //   replicas: params.global.replicas,
     // },
     statefulset+: {
-      DEBUG_LOG: 'true',
+      DEBUG_LOG: 'false',
     },
   },
 };

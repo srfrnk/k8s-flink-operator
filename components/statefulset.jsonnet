@@ -1,3 +1,4 @@
+local params = std.extVar('__ksonnet/params').components.statefulset;
 local imageVersion = std.extVar('IMAGE_VERSION');
 {
   apiVersion: 'apps/v1',
@@ -33,6 +34,10 @@ local imageVersion = std.extVar('IMAGE_VERSION');
               {
                 name: 'IMAGE_VERSION',
                 value: imageVersion,
+              },
+              {
+                name: 'DEBUG_LOG',
+                value: params.DEBUG_LOG,
               },
             ],
             command: [
