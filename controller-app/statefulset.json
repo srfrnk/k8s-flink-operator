@@ -11,8 +11,7 @@
         "replicas": 0,
         "selector": {
             "matchLabels": {
-                "flink-job": "",
-                "version": ""
+                "flink-job": ""
             }
         },
         "serviceName": "",

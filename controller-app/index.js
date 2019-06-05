@@ -63,7 +63,6 @@ function getStatefulset(jobName, configMapName, spec) {
     statefulset.metadata.labels.version = IMAGE_VERSION;
     statefulset.spec.replicas = spec.streaming.replicas;
     statefulset.spec.selector.matchLabels["flink-job"] = jobName;
-    statefulset.spec.selector.matchLabels.version = IMAGE_VERSION;
     statefulset.spec.template = getPodTemplateSpec(jobName, configMapName, spec, true);
 
     return statefulset;
