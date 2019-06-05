@@ -12,6 +12,12 @@
         "streaming": {
             "replicas": 1
         },
+        "env": [
+            {
+                "name": "env1key",
+                "value": "env1value"
+            }
+        ],
         "props": [
             {
                 "key": "envKey1",

@@ -108,14 +108,21 @@
                   },
                 },
               },
+              env: {
+                type: 'array',
+                items: {},
+              },
               volumeMounts: {
-                required: [
-                  'volume',
-                  'mount',
-                ],
-                properties: {
-                  volume: {},
-                  mount: {},
+                type: 'array',
+                items: {
+                  required: [
+                    'volume',
+                    'mount',
+                  ],
+                  properties: {
+                    volume: {},
+                    mount: {},
+                  },
                 },
               },
             },

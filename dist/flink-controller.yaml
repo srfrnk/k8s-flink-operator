@@ -47,6 +47,9 @@ spec:
                   type: string
               required:
               - schedule
+            env:
+              items: {}
+              type: array
             jarImage:
               type: string
             jarPath:
@@ -87,12 +90,14 @@ spec:
               required:
               - replicas
             volumeMounts:
-              properties:
-                mount: {}
-                volume: {}
-              required:
-              - volume
-              - mount
+              items:
+                properties:
+                  mount: {}
+                  volume: {}
+                required:
+                - volume
+                - mount
+              type: array
           required:
           - jobManagerUrl
           - jarImage
@@ -120,7 +125,7 @@ kind: StatefulSet
 metadata:
   labels:
     ksonnet.io/component: statefulset
-    version: 190605-1115
+    version: 190605-1246
   name: flink-controller
   namespace: flink
 spec:
@@ -133,7 +138,7 @@ spec:
     metadata:
       labels:
         app: flink-controller
-        version: 190605-1115
+        version: 190605-1246
     spec:
       containers:
       - args:
@@ -143,10 +148,10 @@ spec:
         - -c
         env:
         - name: IMAGE_VERSION
-          value: 190605-1115
+          value: 190605-1246
         - name: DEBUG_LOG
           value: "false"
-        image: srfrnk/flink-controller-app:190605-1115
+        image: srfrnk/flink-controller-app:190605-1246
         name: controller
         ports:
         - containerPort: 80

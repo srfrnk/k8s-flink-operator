@@ -74,6 +74,7 @@ The following are optional:
 
 * `props`: An array of `{key,value}` props to pass to job. (i.e. via `ParameterTool parameters = ParameterTool.fromArgs(args);`)
 * `volumeMounts`: An array of `volume specs` (See below).
+* `env`: An array of [EnvVars](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.14/#envvar-v1-core).
 
 `volume specs` have the following parameters:
 

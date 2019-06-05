@@ -128,6 +128,7 @@ function getPodTemplateSpec(jobName, configMapName, spec, streaming) {
             "name": "jobProps",
             "value": jobProps
         },
+        ...(spec.env || []),
         ...props.env
     ];
     podSpec.containers[1].env = [
