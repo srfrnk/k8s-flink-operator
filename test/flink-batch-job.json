@@ -5,6 +5,7 @@
         "name": "flink-batch-job"
     },
     "spec": {
+        "version": "IMAGE_VERSION",
         "replicas": 1,
         "jobManagerUrl": "flink-jobmanager:8081",
         "jarImage": "flink-test:IMAGE_VERSION",

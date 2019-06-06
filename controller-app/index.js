@@ -39,57 +39,62 @@ app.listen(80, () => {
 
 function getChildren(jobName, spec) {
     const configMapName = `flink-job-jar-${jobName}`;
-    const controller = getController(jobName, configMapName, spec);
-    const configMap = getConfigMap(configMapName);
+    const version = spec.version || 'NoVersion';
+    const controller = getController(jobName, version, configMapName, spec);
+    const configMap = getConfigMap(version, configMapName);
     return [configMap, controller];
 }
 
-function getController(jobName, configMapName, spec) {
+function getController(jobName, version, configMapName, spec) {
     if (!!spec.streaming) {
-        return getStatefulset(jobName, configMapName, spec);
+        return getStatefulset(jobName, version, configMapName, spec);
     }
 
     if (!!spec.cron) {
-        return getCronJob(jobName, configMapName, spec);
+        return getCronJob(jobName, version, configMapName, spec);
     }
 
     console.log(`Job '${jobName}': Must specify either 'streaming' or 'cron' properties in spec. No controller is created for job.`);
 }
 
-function getStatefulset(jobName, configMapName, spec) {
+function getStatefulset(jobName, version, configMapName, spec) {
     const statefulset = JSON.parse(statefulsetJson);
 
     statefulset.metadata.name = `flink-job-${jobName}`;
-    statefulset.metadata.labels.version = IMAGE_VERSION;
+    statefulset.metadata.labels.version = version;
+    statefulset.metadata.labels['k8s-flink-operator-version'] = IMAGE_VERSION;
     statefulset.spec.replicas = spec.streaming.replicas;
     statefulset.spec.selector.matchLabels["flink-job"] = jobName;
-    statefulset.spec.template = getPodTemplateSpec(jobName, configMapName, spec, true);
+    statefulset.spec.template = getPodTemplateSpec(jobName, version, configMapName, spec, true);
 
     return statefulset;
 }
 
 
-function getCronJob(jobName, configMapName, spec) {
+function getCronJob(jobName, version, configMapName, spec) {
     const cronjob = JSON.parse(cronjobJson);
 
     const name = `flink-job-${jobName}`;
     cronjob.metadata.name = name;
-    cronjob.metadata.labels.version = IMAGE_VERSION;
+    cronjob.metadata.labels.version = version;
+    cronjob.metadata.labels['k8s-flink-operator-version'] = IMAGE_VERSION;
     cronjob.spec.concurrencyPolicy = spec.cron.concurrencyPolicy || 'Allow';
     cronjob.spec.schedule = spec.cron.schedule;
     cronjob.spec.jobTemplate.metadata.name = name;
-    cronjob.spec.jobTemplate.metadata.labels.version = IMAGE_VERSION;
-    cronjob.spec.jobTemplate.spec.template = getPodTemplateSpec(jobName, configMapName, spec, false);
+    cronjob.spec.jobTemplate.metadata.labels.version = version;
+    cronjob.spec.jobTemplate.metadata.labels['k8s-flink-operator-version'] = IMAGE_VERSION;
+    cronjob.spec.jobTemplate.spec.template = getPodTemplateSpec(jobName, version, configMapName, spec, false);
     delete cronjob.spec.jobTemplate.spec.template.spec.containers[0].livenessProbe;
 
     return cronjob;
 }
 
-function getPodTemplateSpec(jobName, configMapName, spec, streaming) {
+function getPodTemplateSpec(jobName, version, configMapName, spec, streaming) {
     const podTemplateSpec = JSON.parse(podTemplateSpecJson);
 
     podTemplateSpec.metadata.labels["flink-job"] = jobName;
-    podTemplateSpec.metadata.labels.version = IMAGE_VERSION;
+    podTemplateSpec.metadata.labels.version = version;
+    podTemplateSpec.metadata.labels['k8s-flink-operator-version'] = IMAGE_VERSION;
 
     const jarDir = path.dirname(spec.jarPath);
     const jarName = path.basename(spec.jarPath);
@@ -168,10 +173,11 @@ function getPodTemplateSpec(jobName, configMapName, spec, streaming) {
     return podTemplateSpec;
 }
 
-function getConfigMap(configMapName) {
+function getConfigMap(version, configMapName) {
     const configMap = JSON.parse(configMapJson);
     configMap.metadata.name = configMapName;
-    configMap.metadata.labels.version = IMAGE_VERSION;
+    configMap.metadata.labels.version = version;
+    configMap.metadata.labels['k8s-flink-operator-version'] = IMAGE_VERSION;
     return configMap;
 }
 

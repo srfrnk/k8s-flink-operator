@@ -5,6 +5,7 @@
         "name": "flink-streaming-job"
     },
     "spec": {
+        "version": "IMAGE_VERSION",
         "jobManagerUrl": "flink-jobmanager:8081",
         "jarImage": "flink-test:IMAGE_VERSION",
         "jarPath": "/jars/flink-test.jar",

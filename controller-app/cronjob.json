@@ -4,7 +4,8 @@
     "metadata": {
         "name": "",
         "labels": {
-            "version": ""
+            "version": "",
+            "k8s-flink-operator-version": ""
         }
     },
     "spec": {
@@ -16,7 +17,8 @@
             "metadata": {
                 "name": "",
                 "labels": {
-                    "version": ""
+                    "version": "",
+                    "k8s-flink-operator-version": ""
                 }
             },
             "spec": {

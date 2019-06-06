@@ -72,6 +72,7 @@ The spec must include:
 
 The following are optional:
 
+* `version`: A string with the version label to be added to all k8s resources. If no `version` is specified a label with `NoVersion` would be added.
 * `props`: An array of `{key,value}` props to pass to job. (i.e. via `ParameterTool parameters = ParameterTool.fromArgs(args);`)
 * `volumeMounts`: An array of `volume specs` (See below).
 * `env`: An array of [EnvVars](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.14/#envvar-v1-core).

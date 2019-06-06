@@ -2,7 +2,8 @@
     "metadata": {
         "labels": {
             "flink-job": "",
-            "version": ""
+            "version": "",
+            "k8s-flink-operator-version": ""
         }
     },
     "spec": {

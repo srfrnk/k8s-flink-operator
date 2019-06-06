@@ -4,7 +4,8 @@
    "metadata": {
       "name": "flink-job-jar",
       "labels": {
-         "version": ""
+         "version": "",
+         "k8s-flink-operator-version": ""
       }
    },
    "data": {
