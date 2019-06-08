@@ -24,3 +24,6 @@ publish: FORCE
 	docker push srfrnk/flink-job-app:${TIMESTAMP}
 
 	ks show publish -V IMAGE_VERSION=$(TIMESTAMP) > dist/flink-controller.yaml
+
+proxy:
+	kubectl port-forward svc/flink-jobmanager 8081:8081

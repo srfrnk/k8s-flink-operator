@@ -9,9 +9,10 @@ done
 
 jobProps=$(eval echo "${jobProps}")
 jobName=$(echo ${jobName/#"flink-job-"})
+cmd="flink run -d -c ${mainClass} -m ${jobManagerUrl} ${jarPath} --jobName '${jobName} (${version})' ${jobProps}"
 
-echo "Starting job... flink run -d -c ${mainClass} -m ${jobManagerUrl} ${jarPath} --jobName ${jobName} ${jobProps}"
-jobRun=$(flink run -d -c ${mainClass} -m ${jobManagerUrl} ${jarPath} --jobName ${jobName} ${jobProps})
+echo "Starting job... ${cmd}"
+jobRun=$(eval ${cmd})
 
 echo ""
 echo ${jobRun}

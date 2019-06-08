@@ -115,7 +115,11 @@ function getPodTemplateSpec(jobName, version, configMapName, spec, streaming) {
         jobNameEnv,
         {
             "name": "DEBUG_LOG",
-            "value": '${DEBUG_LOG}'
+            "value": `${DEBUG_LOG}`
+        },
+        {
+            "name": "version",
+            "value": `${version}`
         },
         {
             "name": "jobManagerUrl",
