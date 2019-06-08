@@ -101,4 +101,4 @@ The `mainClass` must contain `public static void main(String[] args)` function t
 
 ## Notes
 
-- I recently published an article describing how and why I built this. You can [find it here](https://medium.com/@srfrnk_72589/i-flink-you-freaky-and-i-like-you-a-lot-68554f7629df).
+- I recently published an article describing how and why I built this. You can [find it here](https://medium.com/@srfrnk/i-flink-you-freaky-and-i-like-you-a-lot-68554f7629df).
