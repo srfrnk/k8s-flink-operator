@@ -1,0 +1,152 @@
+{
+  "apiVersion": "apiextensions.k8s.io/v1beta1",
+  "kind": "CustomResourceDefinition",
+  "metadata": {
+    "labels": {
+    },
+    "name": "flinkjobs.operators.srfrnk.com",
+    "namespace": "flink"
+  },
+  "spec": {
+    "additionalPrinterColumns": [
+      {
+        "JSONPath": ".metadata.creationTimestamp",
+        "description": "Time since object was created",
+        "name": "Age",
+        "type": "date"
+      }
+    ],
+    "group": "operators.srfrnk.com",
+    "names": {
+      "kind": "FlinkJob",
+      "plural": "flinkjobs",
+      "shortNames": [
+        "flink",
+        "flinks"
+      ],
+      "singular": "flinkjob"
+    },
+    "scope": "Namespaced",
+    "subresources": {
+      "scale": {
+        "labelSelectorPath": ".status.labelSelector",
+        "specReplicasPath": ".spec.replicas",
+        "statusReplicasPath": ".status.replicas"
+      },
+      "status": {}
+    },
+    "validation": {
+      "openAPIV3Schema": {
+        "properties": {
+          "spec": {
+            "properties": {
+              "cron": {
+                "properties": {
+                  "concurrencyPolicy": {
+                    "type": "string"
+                  },
+                  "schedule": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "schedule"
+                ]
+              },
+              "env": {
+                "items": {},
+                "type": "array"
+              },
+              "jarImage": {
+                "type": "string"
+              },
+              "jarPath": {
+                "type": "string"
+              },
+              "jobManagerUrl": {
+                "type": "string"
+              },
+              "mainClass": {
+                "type": "string"
+              },
+              "props": {
+                "items": {
+                  "properties": {
+                    "key": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    },
+                    "valueFrom": {
+                      "properties": {
+                        "configMapKeyRef": {
+                          "properties": {
+                            "key": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "secretKeyRef": {
+                          "properties": {
+                            "key": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "key"
+                  ]
+                },
+                "type": "array"
+              },
+              "streaming": {
+                "properties": {
+                  "replicas": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "replicas"
+                ]
+              },
+              "volumeMounts": {
+                "items": {
+                  "properties": {
+                    "mount": {},
+                    "volume": {}
+                  },
+                  "required": [
+                    "volume",
+                    "mount"
+                  ]
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "jobManagerUrl",
+              "jarImage",
+              "jarPath",
+              "mainClass"
+            ]
+          }
+        },
+        "required": [
+          "spec"
+        ]
+      }
+    },
+    "version": "v1"
+  }
+}

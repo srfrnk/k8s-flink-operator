@@ -1,0 +1,68 @@
+{
+  "apiVersion": "apps/v1",
+  "kind": "StatefulSet",
+  "metadata": {
+    "labels": {
+      "version": "$(IMAGE_VERSION)"
+    },
+    "name": "flink-controller",
+    "namespace": "flink"
+  },
+  "spec": {
+    "replicas": 1,
+    "selector": {
+      "matchLabels": {
+        "app": "flink-controller"
+      }
+    },
+    "serviceName": "flink-controller",
+    "template": {
+      "metadata": {
+        "labels": {
+          "app": "flink-controller",
+          "version": "$(IMAGE_VERSION)"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "args": [
+              "npm start"
+            ],
+            "command": [
+              "bash",
+              "-c"
+            ],
+            "env": [
+              {
+                "name": "IMAGE_VERSION",
+                "value": "$(IMAGE_VERSION)"
+              },
+              {
+                "name": "DEBUG_LOG",
+                "value": "true"
+              }
+            ],
+            "image": "srfrnk/flink-controller-app:$(IMAGE_VERSION)",
+            "name": "controller",
+            "ports": [
+              {
+                "containerPort": 80
+              }
+            ],
+            "resources": {
+              "limits": {
+                "cpu": "100m",
+                "memory": "100Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "10Mi"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "resources": [
+    "../../base"
+  ],
+  "patchesJson6902": [
+    {
+      "target": {
+        "version": "v1",
+        "group": "apps",
+        "kind": "StatefulSet",
+        "namespace": "flink",
+        "name": "flink-controller"
+      },
+      "path": "statefulset-patch.json"
+    }
+  ]
+}

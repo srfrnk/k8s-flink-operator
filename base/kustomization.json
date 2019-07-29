@@ -1,0 +1,17 @@
+{
+  "resources": [
+    "controller.json",
+    "crd.json",
+    "namespace.json",
+    "service.json",
+    "statefulset.json"
+  ],
+  "vars": [
+    {
+      "name": "IMAGE_VERSION",
+      "envref": {
+        "name": "IMAGE_VERSION"
+      }
+    }
+  ]
+}
