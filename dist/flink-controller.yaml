@@ -120,7 +120,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   labels:
-    version: 190729-0756
+    version: 190805-1259
   name: flink-controller
   namespace: flink
 spec:
@@ -133,7 +133,7 @@ spec:
     metadata:
       labels:
         app: flink-controller
-        version: 190729-0756
+        version: 190805-1259
     spec:
       containers:
       - args:
@@ -143,10 +143,10 @@ spec:
         - -c
         env:
         - name: IMAGE_VERSION
-          value: 190729-0756
+          value: 190805-1259
         - name: DEBUG_LOG
           value: "false"
-        image: srfrnk/flink-controller-app:190729-0756
+        image: srfrnk/flink-controller-app:190805-1259
         name: controller
         ports:
         - containerPort: 80
